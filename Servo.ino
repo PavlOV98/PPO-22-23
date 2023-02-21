@@ -6,9 +6,18 @@
 #include <WiFiClient.h>
 const char* ssid = "ROBOT";
 const char* password = "Robot1488";
-#define HUM_PIN A0
 #define SERVO D4
 Servo myservo1;
+
+int zakr=1000;
+int otkr=2000;
+int st=1500;
+int ugol_0=938;
+int ugol_30=860;
+int ugol_45=728;
+int ugol_90=532;
+int ugol_110=452;
+int analog=0;
 
 //Your Domain name with URL path or IP address with path
 const char* serverName = "http://192.168.1.102:8080";
@@ -20,7 +29,6 @@ unsigned long lastTime = 0;
 //unsigned long timerDelay = 600000;
 // Set timer to 5 seconds (5000)
 unsigned long timerDelay = 5000;
-float hg = 55;
 int pos = 0;
 int servo = 0;
 String set ="";
@@ -35,14 +43,14 @@ int c4=133;
 long timer=0;
 bool warning=false;
 int nagruzka=0;
+int servo_liv = 1;
 
 
 
 void setup() {
-  myservo1.attach(SERVO,544,2400);
+  myservo1.attach(SERVO,544,4800);
   Serial.begin(115200);
-  pinMode(HUM_PIN, INPUT);// configure D7 pin as an OUTPUT
-  pinMode(SERVO, OUTPUT);
+  //pinMode(SERVO_READ, INPUT);// configure D7 pin as an OUTPUT
   WiFi.begin(ssid, password);
   Serial.println("Connecting");
   while(WiFi.status() != WL_CONNECTED) {
@@ -57,21 +65,13 @@ void setup() {
 }
 
 void loop() {
-  if((millis()-timer)>30000)warning=false;
-  hg = analogRead(HUM_PIN);
-  hg = map(hg,0, 1024, 100, 0);
-  Serial.print("Sensor value: ");
-  Serial.println(hg);
-  delay(1000);
-if (isnan(hg)) {  // Проверка. Если не удается считать показания, выводится «Ошибка считывания», и программа завершает работу
-    hg = 1000;
-    
-  } 
+ // if((millis()-timer)>30000)warning=false;
+   
 
 
 
-set ="{\"hg\":\"";
-set+=hg;
+set ="{\"servo_liv\":\"";
+set+=servo_liv;;
 set+="\"}";
 
 Serial.println(set);
@@ -101,200 +101,16 @@ Serial.println(set);
       StaticJsonDocument<300> parsed;
        DeserializationError error = deserializeJson(parsed, httpanswer);
       servo = parsed["ass"];
+      servo=int(servo);
       Serial.print("HTTP answer code: ");
       Serial.println(httpanswer);
       Serial.print("HTTP Response code: ");
       Serial.println(httpResponseCode);
       Serial.print("servo: ");
-      Serial.println(servo); 
-      if(warning==false){
-      switch(servo)
-      {
-          case 0:
-          if(pos==c0){
-             break;
-          }
-          if(pos>c0){
-            for(int i=pos;i>c0;i-=ii){
-            myservo1.write(i);
-             if(analogRead(A0)>nagruzka){
-              digitalWrite(D4,LOW); 
-              pos=i;
-                warning=true;
-                timer=millis();
-                break;
-              }
-            delay(delay_servo);
-            }      
-          }else{
-            myservo1.write(c0);   
-          }
-          if(warning)break;
-          pos=c0;
-          delay(3000);
-          digitalWrite(D4,LOW);         
-                 break;     
-          
-          case 1:
-          if(pos==c1){
-             break;
-          }
-          if(pos>c1){
-            for(int i=pos;i>c1;i-=ii){
-            myservo1.write(i);
-            
-            if(analogRead(A0)>nagruzka){
-              digitalWrite(D4,LOW); 
-              pos=i;
-                warning=true;
-                timer=millis();
-                break;
-              }
-            
-            delay(delay_servo);
-            }      
-          }else{
-            for(int i=pos;i<c1;i+=ii){
-            myservo1.write(i); 
-            
-            if(analogRead(A0)>nagruzka){
-              digitalWrite(D4,LOW); 
-              pos=i;
-                warning=true;
-                timer=millis();
-                break;
-              }
-
-            delay(delay_servo);
-            }     
-          }
-          if(warning)break;
-          pos=c1;
-          delay(3000);
-          digitalWrite(D4,LOW);                
-                 break;
-          
-          case 2:
-          if(pos==c2){
-             break;
-          }
-                    if(pos>c2){
-            for(int i=pos;i>c2;i-=ii){
-            myservo1.write(i);
-            
-            if(analogRead(A0)>nagruzka){
-              digitalWrite(D4,LOW); 
-              pos=i;
-                warning=true;
-                timer=millis();
-                break;
-              }
-              
-            delay(delay_servo);
-            }      
-          }else{
-            for(int i=pos;i<c2;i+=ii){
-            myservo1.write(i);
-            
-            if(analogRead(A0)>nagruzka){
-              digitalWrite(D4,LOW); 
-              pos=i;
-                warning=true;
-                timer=millis();
-                break;
-              }
-              
-            delay(delay_servo);
-            }     
-          }
-           if(warning)break;
-
-          pos=c2;
-          delay(3000);
-          digitalWrite(D4,LOW);                      
-                 break;
-          
-          case 3:
-          if(pos==c3){
-             break;
-          }
-                              if(pos>c3){
-            for(int i=pos;i>c3;i-=ii){
-            myservo1.write(i);
-            
-            if(analogRead(A0)>nagruzka){
-              digitalWrite(D4,LOW); 
-              pos=i;
-                warning=true;
-                timer=millis();
-                break;
-              }
-            
-            delay(delay_servo);
-            }      
-          }else{
-            for(int i=pos;i<c3;i+=ii){
-            myservo1.write(i);
-            
-            if(analogRead(A0)>nagruzka){
-              digitalWrite(D4,LOW); 
-              pos=i;
-                warning=true;
-                timer=millis();
-                break;
-              }
-            
-            delay(delay_servo);
-            }     
-          }
-          if(warning)break;
-          
-          pos=c3; 
-          delay(3000);
-          digitalWrite(D4,LOW);   
-                 break;
-         
-          case 4:
-          if(pos==c4){
-             break;
-          }
-                              if(pos>c4){
-            for(int i=pos;i>c4;i-=ii){
-            myservo1.write(i);
-            
-            if(analogRead(A0)>nagruzka){
-              digitalWrite(D4,LOW); 
-              pos=i;
-                warning=true;
-                timer=millis();
-                break;
-              }
-              
-            delay(delay_servo);
-            }      
-          }else{
-            for(int i=pos;i<c4;i+=ii){
-            myservo1.write(i);
-            
-            if(analogRead(A0)>nagruzka){
-              digitalWrite(D4,LOW); 
-              pos=i;
-                warning=true;
-                timer=millis();
-                break;
-              }
-              
-            delay(delay_servo);
-            }     
-          }
-          if(warning)break;
-          pos=c4 ;
-          delay(3000);
-          digitalWrite(D4,LOW);                
-                 break;
-         
-      } 
-      }
+      Serial.println(servo);
+      
+  
+     
       http.end();
     }
     else {
@@ -302,5 +118,147 @@ Serial.println(set);
     }
     lastTime = millis();
   }
+  // if(warning==false){
+      switch(servo)
+      {
+          case 0:
+          analog=analogRead(A0);
+if(analog<ugol_0-4){
+myservo1.writeMicroseconds(zakr);
+delay(22);
+myservo1.writeMicroseconds(1500);
+delay(100);
+  while(analog<ugol_0-4){
+  myservo1.writeMicroseconds(zakr);
+  delay(18);
+  myservo1.writeMicroseconds(1500);
+  analog=analogRead(A0);
+  Serial.print(" d ");
+  Serial.println(analog);
+  delay(100);
+  }
+}  
+break;
+          
+          case 1:
+          analog=analogRead(A0);
+          if(analog<ugol_30-4){
+myservo1.writeMicroseconds(zakr);
+delay(22);
+myservo1.writeMicroseconds(1500);
+delay(100);
+  while(analog<ugol_30-4){
+  myservo1.writeMicroseconds(zakr);
+  delay(18);
+  myservo1.writeMicroseconds(1500);
+  analog=analogRead(A0);
+  Serial.print(" d ");
+  Serial.println(analog);
+  delay(100);
+  }
+}else if(analog>ugol_30+4){
+myservo1.writeMicroseconds(otkr);
+delay(22);
+myservo1.writeMicroseconds(1500);
+delay(100);
+  while(analog>ugol_30+4){
+  myservo1.writeMicroseconds(otkr);
+  delay(18);
+  myservo1.writeMicroseconds(1500);
+  analog=analogRead(A0);
+  Serial.print(" d ");
+  Serial.println(analog);
+  delay(100);
+  }
+}
+break;
+          
+          case 2:
+          analog=analogRead(A0);
+         if(analog<ugol_45-4){
+myservo1.writeMicroseconds(zakr);
+delay(22);
+myservo1.writeMicroseconds(1500);
+delay(100);
+  while(analog<ugol_45-4){
+  myservo1.writeMicroseconds(zakr);
+  delay(18);
+  myservo1.writeMicroseconds(1500);
+  analog=analogRead(A0);
+  Serial.print(" d ");
+  Serial.println(analog);
+  delay(100);
+  }
+}else if(analog>ugol_45+4){
+myservo1.writeMicroseconds(otkr);
+delay(22);
+myservo1.writeMicroseconds(1500);
+delay(100);
+  while(analog>ugol_45+4){
+  myservo1.writeMicroseconds(otkr);
+  delay(18);
+  myservo1.writeMicroseconds(1500);
+  analog=analogRead(A0);
+  Serial.print(" d ");
+  Serial.println(analog);
+  delay(100);
+  }
+}
+break;
+          
+          case 3:
+          analog=analogRead(A0);
+         if(analog<ugol_90-8){
+myservo1.writeMicroseconds(zakr);
+delay(22);
+myservo1.writeMicroseconds(1500);
+delay(100);
+  while(analog<ugol_90-8){
+  myservo1.writeMicroseconds(zakr);
+  delay(18);
+  myservo1.writeMicroseconds(1500);
+  analog=analogRead(A0);
+  Serial.print(" d ");
+  Serial.println(analog);
+  delay(100);
+  }
+}else if(analog>ugol_90+8){
+myservo1.writeMicroseconds(otkr);
+delay(22);
+myservo1.writeMicroseconds(1500);
+delay(100);
+  while(analog>ugol_90+8){
+  myservo1.writeMicroseconds(otkr);
+  delay(18);
+  myservo1.writeMicroseconds(1500);
+  analog=analogRead(A0);
+  Serial.print(" d ");
+  Serial.println(analog);
+  delay(100);
+  }
+}
+break;
+         
+          case 4:
+         analog=analogRead(A0);
+        if(analog>ugol_110+8){
+myservo1.writeMicroseconds(otkr);
+delay(22);
+myservo1.writeMicroseconds(1500);
+delay(100);
+  while(analog>ugol_110+8){
+  myservo1.writeMicroseconds(otkr);
+  delay(18);
+  myservo1.writeMicroseconds(1500);
+  analog=analogRead(A0);
+  Serial.print(" d ");
+  Serial.println(analog);
+  delay(100);
+  }
+}
+break;
+         
+      } 
+      //}
  
 }
